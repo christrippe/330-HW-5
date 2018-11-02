@@ -4,21 +4,26 @@ author: "Ethan Kemeny Chris Trippe"
 date: "10/27/2018"
 output: html_document
 ---
-1.
 
-Marcroeconomists hypothesize that there is a relationship between life expectancy and the economic well-being  of the country. The given data provides a economic group for which each country is a part of (OECD--the organisation for Economic Co-operation and Development, a think tank set towards improving global social and economic well-being, Africa, or another group) and the per person GDP (PPDGP). Building a regression model will allow for inference on which group is associated with higher life expectancy and help understand the effect PPDGP has on life expectancy.
-
-```{r, messege = FALSE, echo = FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(MASS)
 library(lmtest)
 library(car)
 library(gridExtra)
+```
 
-life_data <- read.table(file = "life.txt", header = TRUE)
+1.
+
+Marcroeconomists hypothesize that there is a relationship between life expectancy and the economic well-being  of the country. The given data provides a economic group for which each country is a part of (OECD--the organisation for Economic Co-operation and Development, a think tank set towards improving global social and economic well-being, Africa, or another group) and the per person GDP (PPDGP). Building a regression model will allow for inference on which group is associated with higher life expectancy and help understand the effect PPDGP has on life expectancy.
+
+```{r, messege = FALSE, echo = FALSE}
+
+life_data <- read.table(file = "life.txt", header = TRUE, stringsAsFactors = TRUE)
 
 #life_data$Group <- factor(life_data$Group, levels = c("level2", "level3", "level1"))
-
+life_data$Group <- relevel(life_data$Group, "other")
 ```
 
 2.
@@ -41,3 +46,12 @@ $\beta_1$: Holding all else contstant, as PPGDP goes up, the life expectancy goe
 $\beta_2$: For equal PPGDP levels, a country in group africa has a $\beta_2$ higher life expectancy than a country in group "other", on average. 
 
 $\beta_3$: For equal PPGDP levels, a country in group oecd has a $\beta_3$ higher life expectancy than a country in group "other", on average. 
+
+
+
+```{r}
+#Transformed slr with interactions
+slr_transform <- lm(LifeExp ~ log(PPGDP) + Group + log(PPGDP)*Group, data = life_data)
+summary(slr_transform)
+```
+
