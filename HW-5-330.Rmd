@@ -22,14 +22,13 @@ Marcroeconomists hypothesize that there is a relationship between life expectanc
 
 life_data <- read.table(file = "life.txt", header = TRUE, stringsAsFactors = TRUE)
 
-#life_data$Group <- factor(life_data$Group, levels = c("level2", "level3", "level1"))
 life_data$Group <- relevel(life_data$Group, "other")
 ```
 
 2.
 
 ```{r}
-scatter <- ggplot(data = life_data, aes(x = log(life_data$PPGDP), y = life_data$LifeExp, group = interaction(life_data$Group))) + geom_point(aes(color = interaction(life_data$Group))) + geom_smooth(method = lm, aes(color = interaction(life_data$Group)), se = FALSE) + xlab("PPGDP") + ylab("Life Expectancy") + labs(color = "Group")+ scale_color_manual(values=c("Purple", "Red", "Blue")) +
+scatter <- ggplot(data = life_data, aes(x = log(life_data$PPGDP), y = life_data$LifeExp, group = interaction(life_data$Group))) + geom_point(aes(color = interaction(life_data$Group))) + geom_smooth(method = lm, aes(color = interaction(life_data$Group)), se = FALSE) + xlab("log(PPGDP)") + ylab("Life Expectancy") + labs(color = "Group")+ scale_color_manual(values=c("Purple", "Red", "Blue")) +
   theme_bw()
 
 box <- ggplot(life_data, aes(x = life_data$Group, y = life_data$LifeExp)) + geom_boxplot() +  ylab("Life Expectancy") + xlab("Group") + theme_bw() 
@@ -37,21 +36,27 @@ box <- ggplot(life_data, aes(x = life_data$Group, y = life_data$LifeExp)) + geom
 grid.arrange(scatter, box, ncol= 2)
 ```
 
-$$y_i = \beta_0 + \beta_1(PPGDP_i) + \beta_2I(Group_i = africa) + \beta_3I(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
+IM NOT SURE HOW TO TALK ABOUT INTERACTION HERE. Maybe slope?
 
-$\beta_0$: the intercept; for countries in groups other than Africa and OECD and a PPGDP of zero, the life expectancy is $\beta_0$, on average.
+When looking at the scatterplot of Life Expectancy and log(PPGDP), group africa and other have about the same slope while group oecd slope is different. This means that depending on whether the group is oecd or not, the effect that log(PPGDP) has on Life Expectancy differs. This implies an interaction.
 
-$\beta_1$: Holding all else contstant, as PPGDP goes up, the life expectancy goes up by $\beta_1$, on average.
+3.
 
-$\beta_2$: For equal PPGDP levels, a country in group africa has a $\beta_2$ higher life expectancy than a country in group "other", on average. 
+$$y_i = \beta_0 + \beta_1(log(PPGDP)_i) + \beta_2I(Group_i = africa) +\\ \beta_3I(Group_i = oecd) + \beta_4(log(PPGDP)_i)(Group_i = afica) + \\ \beta_5(log(PPGDP)_i)(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
+
+$\beta_0$: the intercept; for countries in groups other than Africa and OECD with a PPGDP of zero, the life expectancy is $\beta_0$, on average.
+
+$\beta_1$: Holding all else contstant, as PPGDP goes up by 1, the life expectancy goes up by $\beta_1$, on average.
+
+$\beta_2$: For equal PPGDP levels, a country in group africa has a $\beta_2$ lower life expectancy than a country in group "other", on average. 
 
 $\beta_3$: For equal PPGDP levels, a country in group oecd has a $\beta_3$ higher life expectancy than a country in group "other", on average. 
-
 
 
 ```{r}
 #Transformed slr with interactions
 slr_transform <- lm(LifeExp ~ log(PPGDP) + Group + log(PPGDP)*Group, data = life_data)
-summary(slr_transform)
+summary(slr_transform)$coefficients
 ```
 
+$$y_i = 50.42 + 2.94(log(PPGDP)_i) - 11.9I(Group_i = africa) + \\ 11.29I(Group_i = oecd) - 0.04(log(PPGDP)_i)(Group_i = afica) - \\ 0.95(log(PPGDP)_i)(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
