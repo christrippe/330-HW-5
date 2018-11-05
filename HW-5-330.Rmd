@@ -43,21 +43,21 @@ When looking at the scatterplot of Life Expectancy and log(PPGDP), group africa 
 
 $$y_i = \beta_0 + \beta_1(log(PPGDP)_i) + \beta_2I(Group_i = africa) +\\ \beta_3I(Group_i = oecd) + \beta_4(log(PPGDP)_i)(Group_i = afica) + \\ \beta_5(log(PPGDP)_i)(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
 
-$\beta_0$: the intercept; for countries in groups other than Africa and OECD with a PPGDP of zero, the life expectancy is $\beta_0$, on average.
+$\beta_0$: the intercept; for countries in groups other than Africa and OECD with a log(PPGDP) of zero, the life expectancy is $\beta_0$, on average.
 
 $\beta_1$: Holding all else contstant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by $\beta_1$, on average.
 
-$\beta_2$: For equal PPGDP levels, a country in group Africa has a increase of $\beta_2$ life expectancy than a country in group "other", on average not including the interaction. 
+$\beta_2$: For equal log(PPGDP) levels, a country in group Africa has a increase of $\beta_2$ life expectancy than a country in group "other", on average. 
 
-$\beta_3$: For equal PPGDP levels, a country in group oecd has a $\beta_3$ higher life expectancy than a country in group "other", on average not including the interaction. 
+$\beta_3$: For equal log(PPGDP) levels, a country in group oecd has a $\beta_3$ higher life expectancy than a country in group "other", on average. 
 
-$\beta_4$: The increase of life expencatncy for an African country in addition to $\beta_1$ as log(PPGDP) goes up by 1.
+$\beta_4$: Life expencatncy is expected to increase by $\beta_4 + \beta_2$ more for an African country than a country in group other as log(PPGDP) goes up by 1.
 
-$\beta_5$: The increase of life expencatncy for an OECD country in addition to $\beta_1$ as log(PPGDP) goes up by 1.
+$\beta_4$: Life expencatncy is expected to increase by $\beta_5 + \beta_3$ more for an OECD country than a country in group other as log(PPGDP) goes up by 1.
 
 This model assumes linear data, independence, normality of the residuals and equal variance.
 
-Using this model we will know that being in an OECD country, on average we'd expect life expectancy to be $\beta_3$ + $\beta_5$ higher than a country in group other.  
+The purpose of this model is to make predictions of life expectancy. For group other, use $\beta_0 + \beta_1(log(PPGDP)_i)$ to predict life expectancy. For group Africa, use $\beta_0 + \beta_1(log(PPGDP)_i) + \beta_2 + \beta_4(log(PPGDP)_i)$ to predict life expectancy. Lastly, for group OECD use $\beta_0 + \beta_1(log(PPGDP)_i) +\beta_3 + \beta_5(log(PPGDP)_i)$ to predict life expectancy. 
 
 
 4. 
