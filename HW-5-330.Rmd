@@ -57,7 +57,7 @@ $\beta_5$: The increase of life expencatncy for an OECD country in addition to $
 
 This model assumes linear data, independence, normality of the residuals and equal variance.
 
-Using this model we will know that being in an OECD country, on average we'd expect life expectancy to be $\beta_3$ + $\beta_5$ higher than a country in group other.  
+The purpose of this model is to make predictions of life expectancy. For group other, use $\beta_0 + \beta_1(log(PPGDP)_i)$ to predict life expectancy. For group Africa, use $\beta_0 + \beta_1(log(PPGDP)_i) + \beta_2 + \beta_4(log(PPGDP)_i)$ to predict life expectancy. Lastly, for group OECD use $\beta_0 + \beta_1(log(PPGDP)_i) +\beta_3 + \beta_5(log(PPGDP)_i)$ to predict life expectancy. 
 
 
 4. 
