@@ -1,12 +1,14 @@
 ---
 title: "life expectancy"
-author: "Ethan Kemeny Chris Trippe"
-date: "10/27/2018"
-output: html_document
+author: "Ethan Kemeny & Chris Trippe"
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(comment = "")
 library(tidyverse)
 library(MASS)
 library(lmtest)
@@ -16,7 +18,7 @@ library(gridExtra)
 
 1.
 
-Marcroeconomists hypothesize that there is a relationship between life expectancy and the economic well-being  of the country. The given data provides a economic group for which each country is a part of (OECD--the organisation for Economic Co-operation and Development, a think tank set towards improving global social and economic well-being, Africa, or another group) and the per person GDP (PPDGP). Building a regression model will allow for inference on which group is associated with higher life expectancy and help understand the effect PPDGP has on life expectancy.
+Macroeconomists hypothesize that there is a relationship between life expectancy and the economic well-being of the country. The given data provides an economic group for which each country is a part of (OECD--the organization for Economic Co-operation and Development, a think tank set towards improving global social and economic well-being, Africa, or another group) and the per person GDP (PPDGP). Building a regression model will allow for inference on which group is associated with higher life expectancy and help understand the effect PPDGP has on life expectancy.
 
 ```{r, messege = FALSE, echo = FALSE}
 
@@ -30,32 +32,34 @@ life_data$Group <- relevel(life_data$Group, "other")
 ```{r}
 scatter <- ggplot(data = life_data, aes(x = log(life_data$PPGDP), y = life_data$LifeExp, group = interaction(life_data$Group))) + geom_point(aes(color = interaction(life_data$Group))) + xlab("log(PPGDP)") + ylab("Life Expectancy") + labs(color = "Group")+ scale_color_manual(values=c("Purple", "Red", "Blue")) +
   theme_bw()
+```
+```{r}
 
 box <- ggplot(life_data, aes(x = life_data$Group, y = life_data$LifeExp)) + geom_boxplot() +  ylab("Life Expectancy") + xlab("Group") + theme_bw() 
-
-grid.arrange(scatter, box, ncol= 2)
+scatter
+box
 ```
 
 
-When looking at the scatterplot of Life Expectancy and log(PPGDP), group africa and other have about the same slope while group oecd slope is different. This means that depending on whether the group is oecd or not, the effect that log(PPGDP) has on Life Expectancy differs. This implies an interaction.
+When looking at the scatterplot of Life Expectancy and log(PPGDP), group Africa and other have about the same slope while group OECD slope is different. This means that depending on whether the group is OECD or not, the effect that log(PPGDP) has on Life Expectancy differs. This implies an interaction.
 
 3.
 
-$$y_i = \beta_0 + \beta_1(log(PPGDP)_i) + \beta_2I(Group_i = africa) +\\ \beta_3I(Group_i = oecd) + \beta_4(log(PPGDP)_i)(Group_i = afica) + \\ \beta_5(log(PPGDP)_i)(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
+$$y_i = \beta_0 + \beta_1(log(PPGDP)_i) + \beta_2I(Group_i = africa) + \beta_3I(Group_i = oecd) + \beta_4(log(PPGDP)_i)(Group_i = afica) +  \beta_5(log(PPGDP)_i)(Group_i = oecd) + \epsilon_{ip} \text{ where } \epsilon_i \sim \mathcal{N}(\mu,\,\sigma^{2})$$
 
 $\beta_0$: the intercept; for countries in groups other than Africa and OECD with a log(PPGDP) of zero, the life expectancy is $\beta_0$, on average.
 
-$\beta_1$: Holding all else contstant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by $\beta_1$, on average.
+$\beta_1$: Holding all else constant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by $\beta_1$, on average.
 
-$\beta_2$: For equal log(PPGDP) levels, a country in group Africa has a increase of $\beta_2$ life expectancy than a country in group "other", on average. 
+$\beta_2$: For equal log(PPGDP) levels, a country in group Africa has an increase of $\beta_2$ life expectancy than a country in group "other", on average. 
 
-$\beta_3$: For equal log(PPGDP) levels, a country in group oecd has a $\beta_3$ higher life expectancy than a country in group "other", on average. 
+$\beta_3$: For equal log(PPGDP) levels, a country in group OECD has a $\beta_3$ higher life expectancy than a country in group "other", on average. 
 
-$\beta_4$: Life expencatncy is expected to increase by $\beta_4 + \beta_2$ more for an African country than a country in group other as log(PPGDP) goes up by 1.
+$\beta_4$: Life expectancy is expected to increase by $\beta_4 + \beta_2$ more for an African country than a country in the group other as log(PPGDP) goes up by 1.
 
-$\beta_5$: Life expencatncy is expected to increase by $\beta_5 + \beta_3$ more for an OECD country than a country in group other as log(PPGDP) goes up by 1.
+$\beta_5$: Life expectancy is expected to increase by $\beta_5 + \beta_3$ more for an OECD country than a country in the group other as log(PPGDP) goes up by 1.
 
-This model assumes linear data, independence, normality of the residuals and equal variance.
+This model assumes linear data, independence, the normality of the residuals and equal variance.
 
 The purpose of this model is to make predictions of life expectancy. For group other, use $\beta_0 + \beta_1(log(PPGDP)_i)$ to predict life expectancy. For group Africa, use $\beta_0 + \beta_1(log(PPGDP)_i) + \beta_2 + \beta_4(log(PPGDP)_i)$ to predict life expectancy. Lastly, for group OECD use $\beta_0 + \beta_1(log(PPGDP)_i) +\beta_3 + \beta_5(log(PPGDP)_i)$ to predict life expectancy. 
 
@@ -71,15 +75,15 @@ $$y_i = 50.42 + 2.94(log(PPGDP)_i) - 11.9I(Group_i = africa) + 11.29I(Group_i = 
 
 $\beta_0$: the intercept; for countries in groups other than Africa and OECD with a log(PPGDP) of zero, the life expectancy is 50.42, on average.
 
-$\beta_1$: Holding all else contstant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by 2.94, on average.
+$\beta_1$: Holding all else constant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by 2.94, on average.
 
-$\beta_2$: For equal log(PPGDP) levels, a country in group Africa has a 11.9 lower life expectancy than a country in group "other", on average. 
+$\beta_2$: For equal log(PPGDP) levels, a country in group Africa has an 11.9 lower life expectancy than a country in group "other", on average. 
 
-$\beta_3$: For equal log(PPGDP) levels, a country in group oecd has a 11.29 higher life expectancy than a country in group "other", on average. 
+$\beta_3$: For equal log(PPGDP) levels, a country in group OECD has an 11.29 higher life expectancy than a country in group "other", on average. 
 
-$\beta_4$: Life expencatncy is expected to decrease by 11.9 + 0.04 or 11.94 if a group changes from other to African and the log(PPGDP) goes up by 1.
+$\beta_4$: Life expectancy is expected to decrease by 11.9 + 0.04 or 11.94 if a group changes from other to African and the log(PPGDP) goes up by 1.
 
-$\beta_5$: Life expencatncy is expected to increase by 11.29 - 0.95 or 10.34 if a group changes from other to African and the log(PPGDP) goes up by 1.
+$\beta_5$: Life expectancy is expected to increase by 11.29 - 0.95 or 10.34 if a group changes from other to African and the log(PPGDP) goes up by 1.
 
 ```{r}
 scatter + geom_smooth(method = lm, aes(color = interaction(life_data$Group)), se = FALSE)
@@ -141,18 +145,21 @@ coverage_mean <- mean(coverage)
 width_mean <- mean(width)
 ```
 
-Using a cross-validation study of 500 samples we are able to get a sense of how accurate our model is at predicting life expectancy.  The bias is `r bias_mean`.  This means our model typically predicts life expectancy`r bias_mean` below the actual value on average. That value is relatively small so we feel our model isn't very biased. The root prediction mean squared error value of `r rpmse_mean` tells us our predictions miss the mark by an average of `r rpmse_mean`. This is also very low so we feel that our model is accurate in it's predictions. 
+Using a cross-validation study of 500 samples we are able to get a sense of how accurate our model is at predicting life expectancy.  The bias is `r bias_mean`.  This means our model typically predicts life expectancy  `r bias_mean` below the actual value on average. That value is relatively small so we feel our model isn't very biased. The root prediction mean squared error value of `r rpmse_mean` tells us our predictions miss the mark by an average of `r rpmse_mean`. This is also very low so we feel that our model is accurate in its predictions. 
 
 We also wanted to look at our prediction intervals or the low and high end of our estimated values.  The study returned a coverage of `r coverage_mean` which is the percentage of prediction intervals that contain the actual value.  With a width of `r width_mean`, we can conclude that our prediction intervals are not very large relative to the data.
 
-The $R^{2}$ for this model is `r r2` this means our model of log(PPGDP) + the groups and the interactions can explain `r r2 * 100`% of the variation in life expectancy.  This value is quite high, becasue of this value and the other statistics from the study so we feel confident in our model's ablitiy to predict values.
+The $R^{2}$ for this model is `r r2` this means our model of log(PPGDP) + the groups and the interactions can explain `r r2 * 100`% of the variation in life expectancy.  This value is quite high, because of this value and the other statistics from the study so we feel confident in our model's ability to predict values.
 
 6.
 
 ```{r}
-summary(slr_transform)
+#anova(slr_transform)
+#summary(slr_transform)
+summary(slr_transform)[10]
+writeLines("p-value: 2.2e-16")
 ```
-With a p-value of 2,2e-16 from the F-test, we can conclude that at least one of the variable coefficients is signifigant. 
+With a p-value of 2.2e-16 from the F-test, we can conclude that at least one of the variable coefficients is significant. 
 
 ```{r}
 confint(slr_transform)
@@ -160,9 +167,9 @@ confint(slr_transform)
 
 For log(PPGDP), we are 95% confident that the true increase in life expectancy for the group other, as log(PPGDP) goes up by 1, is between 2.77 and 3.1004.
 
-For the interaction between log(PPGDP) and Group:OECD we are 95% confident that life expectancy will decrease between 1.57 and .335 for countires that change from other to the OECD when the log(PPGDP) goes up by 1.
+For the interaction between log(PPGDP) and Group: OECD we are 95% confident that life expectancy will decrease between 1.57 and .335 for countries that change from other to the OECD when the log(PPGDP) goes up by 1.
 
-With this data, we can conclude that countries with higher GDP will have higher life expectancy.
+With this data, we can conclude that countries with higher GDP will have a higher life expectancy.
 
 
 7.
@@ -171,7 +178,7 @@ slr_reduced <- lm(LifeExp ~ log(PPGDP) + Group, data = life_data)
 anova(slr_transform,slr_reduced)
 ```
 
-
+With a p-value of .01083, we reject the null hypothesis that the interaction is not significant.  This means we know that the group a country is in has a significant impact on how log(PPGDP) affects life expectancy. This means that when looking at the relationship between log(PPGDP) and life expectancy, the group variable must be taken into account. 
 
 
 
