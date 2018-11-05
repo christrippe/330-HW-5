@@ -45,7 +45,7 @@ $$y_i = \beta_0 + \beta_1(log(PPGDP)_i) + \beta_2I(Group_i = africa) +\\ \beta_3
 
 $\beta_0$: the intercept; for countries in groups other than Africa and OECD with a PPGDP of zero, the life expectancy is $\beta_0$, on average.
 
-$\beta_1$: Holding all else contstant and being in group other, as PPGDP goes up by 1, the life expectancy goes up by $\beta_1$, on average.
+$\beta_1$: Holding all else contstant and being in group other, as log(PPGDP) goes up by 1, the life expectancy goes up by $\beta_1$, on average.
 
 $\beta_2$: For equal PPGDP levels, a country in group Africa has a increase of $\beta_2$ life expectancy than a country in group "other", on average not including the interaction. 
 
@@ -74,16 +74,101 @@ scatter + geom_smooth(method = lm, aes(color = interaction(life_data$Group)), se
 ```
 
 5. 
+```{r}
+# R-squared
+r2 <- round(summary(slr_transform)$r.squared,4)
+```
+
+```{r}
+## Fit transformed model and verify 
 
 
+
+# Cross validate
+n.cv <- 500
+n.test <- 27
+bias <- rep(NA,n.cv)
+rpmse <- rep(NA,n.cv)
+coverage <- rep(NA,n.cv)
+width <- rep(NA,n.cv)
+for(cv in 1:n.cv){
+  
+  test.obs <- sample(nrow(life_data),n.test)
+  test.set <- life_data[test.obs,]
+  train.set <- life_data[-test.obs,]
+  
+  train.lm <- lm(LifeExp ~ log(PPGDP) + Group + log(PPGDP)*Group, data = train.set)
+  
+  test.preds <- predict.lm(train.lm,newdata=test.set,interval="prediction")
+  
+  bias[cv] <- mean(test.preds[,1]-test.set$LifeExp)
+  rpmse[cv] <- sqrt(mean(test.preds[,1]-test.set$LifeExp)^2)
+  coverage[cv] <- mean(test.set$LifeExp > test.preds[,2] & test.set$LifeExp < test.preds[,3])
+  width[cv] <- mean(test.preds[,3]-test.preds[,2])
+}
+
+# bias.hist <- ggplot()+geom_histogram(aes(x=bias))+xlab('Bias')+ylab('Count')
+# 
+# rpmse.hist <- ggplot()+geom_histogram(aes(x=rpmse))+xlab('RPMSE')+ylab('Count')
+# 
+# coverage.hist <- ggplot()+geom_histogram(aes(x=coverage))+xlab('Coverage')+ylab('Count')
+# 
+# width.hist <- ggplot()+geom_histogram(aes(x=width/2))+xlab('Half Width')+ylab('Count')
+# 
+# grid.arrange(bias.hist,rpmse.hist,coverage.hist,width.hist,nrow=2)
+
+
+```
+
+
+```{r}
+#Cross-Validation statistics
+bias_mean <- round(mean(bias),4)
+rpmse_mean <- round(mean(rpmse),4)
+coverage_mean <- mean(coverage)
+width_mean <- mean(width)
+```
+
+Using a cross-validation study of 500 samples we are able to get a sense of how accurate our model is at predicting life expectancy.  The bias is `r bias_mean`.  This means our model typically predicts life expectancy`r bias_mean` below the actual value on average. That value is relatively small so we feel our model isn't very biased. The root prediction mean squared error value of `r rpmse_mean` tells us our predictions miss the mark by an average of `r rpmse_mean`. This is also very low so we feel that our model is accurate in it's predictions. 
+
+We also wanted to look at our prediction intervals or the low and high end of our estimated values.  The study returned a coverage of `r coverage_mean` which is the percentage of prediction intervals that contain the actual value.  With a width of `r width_mean`, we can conclude that our prediction intervals are not very large relative to the data.
+
+The $R^{2}$ for this model is `r r2` this means our model of log(PPGDP) + the groups and the interactions can explain `r r2 * 100`% of the variation in life expectancy.  This value is quite high, becasue of this value and the other statistics from the study so we feel confident in our model's ablitiy to predict values.
 
 6.
 
 ```{r}
 summary(slr_transform)
 ```
+With a p-value of 2,2e-16 from the F-test, we can conclude that at least one of the variable coefficients is signifigant. 
 
 ```{r}
 confint(slr_transform)
 ```
+
+For log(PPGDP), we are 95% confident that the true increase in life expectancy for the group other, as log(PPGDP) goes up by 1, is between 2.77 and 3.1004.
+
+For the interaction between log(PPGDP) and Group:OECD we are 95% confident the true increase in life expectancy for the OECD countries, as log(PPGDP) goes up by 1, will be the difference between log(PPGDP) and 1.57 to .335.
+
+With this data, we can conclude that countries with higher GDP will have higher life expectancy.
+
+
+7.
+```{r}
+slr_reduced <- lm(LifeExp ~ log(PPGDP) + Group, data = life_data)
+anova(slr_transform,slr_reduced)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
